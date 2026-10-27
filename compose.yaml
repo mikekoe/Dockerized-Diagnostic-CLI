@@ -1,0 +1,24 @@
+name: diagnostic
+
+services:
+  diagnostic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: diagnostic-tool:latest
+    # Default command; override per run, e.g.:
+    #   docker compose run --rm diagnostic network example.com
+    command: ["help"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_RAW        # lets ping send ICMP as the non-root user
+    healthcheck:
+      test: ["CMD", "/app/health-check.sh"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
